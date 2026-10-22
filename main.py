@@ -34,7 +34,7 @@ def main(page: ft.Page):
         ultimo["y"] = None
 
     def reiniciar(e):
-        parametros.uptade(inicial)
+        parametros.update(inicial)
         actualizar()
 
     def redimensionar(e):
