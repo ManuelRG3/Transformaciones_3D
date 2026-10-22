@@ -2,10 +2,14 @@ import flet as ft
 from Controlador.Escena import calcular_escena
 from Interfaz.Lienzo import crear_lienzo, dibujar
 
+sensibilidad = 0.5
+inicial = {"rx" : 25, "ry" : 30}
+
 def main(page: ft.Page):
     page.title = "Transformacion 3D"
     page.scroll = ft.ScrollMode.AUTO
-    parametros = {"ry": 30}
+    parametros = dict(inicial)
+    ultimo = {"x" : None, "y" : None}
 
     def calcular_lado():
         ancho = page.width or 500
@@ -17,8 +21,20 @@ def main(page: ft.Page):
         puntos, aristas, matriza = calcular_escena(parametros)
         dibujar(lienzo, puntos, aristas)
 
-    def cambiar_ry(e):
-        parametros["ry"] = e.control.value
+    def arrastrar(e):
+        x, y = e.local_position.x, e.local_position.y
+        if ultimo["x"] is not None:
+            parametros["ry"] += (x - ultimo["x"]) * sensibilidad
+            parametros["rx"] += (y - ultimo["y"]) * sensibilidad
+            actualizar()
+        ultimo["x"], ultimo["y"] = x, y
+
+    def soltar(e):
+        ultimo["x"] = None
+        ultimo["y"] = None
+
+    def reiniciar(e):
+        parametros.uptade(inicial)
         actualizar()
 
     def redimensionar(e):
@@ -29,13 +45,25 @@ def main(page: ft.Page):
 
     page.on_resize = redimensionar
 
+    figura = ft.GestureDetector(
+        content=lienzo, 
+        mouse_cursor= ft.MouseCursor.MOVE, 
+        on_pan_update= arrastrar, 
+        on_pan_end= soltar,
+    )
+
     page.add(
         ft.Row(
-            wrap=True, spacing=20, controls=[
-                lienzo, ft.Container(width=300, content=ft.Column([
-                    ft.Text("Rotacion en Y (grados)"), ft.Slider(min=0, max=360, value=30, on_change=cambiar_ry),]),
-                                    ),
-            ],
+            wrap=True, 
+            spacing=20, 
+            controls=[
+                figura, 
+                ft.Container(width=300,
+                             content=ft.Column([
+                                 ft.Text("Arrastrar la figura para rotarla"),
+                                 ft.TextButton("Reiniciar", on_click=reiniciar)
+                             ]))
+            ]
         )
     )
     actualizar()
