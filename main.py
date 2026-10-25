@@ -13,6 +13,8 @@ modos = {
                      "Escalamiento: arrastra para estirar en X e Y; pellizca (o usa la rueda) para escalar todo por igual"),
     "rotacion": ("Rotación",
                  "Rotación: arrastra para girar en X e Y; gira dos dedos (o usa la rueda) para rotar en Z"),
+    "sesgado" : ("Sesgado",
+                 "Sesgado: Arrastra para inclinar la figura (a los lados, arriba o abajo); pellizca o usa la rueda del raton para inclinarla segun la profundidad"),
 }
 
 
@@ -48,6 +50,9 @@ def main(page: ft.Page):
         elif modo == "rotacion":
             parametros["ry"] += dx * sensibilidad
             parametros["rx"] += dy * sensibilidad
+        elif modo == "sesgado" :
+            parametros["shxy"] = limitar(parametros["shxy"] + dx * 0.004, -1, 1)
+            parametros["shyx"] = limitar(parametros["shyx"] - dy * 0.004, -1, 1)
 
     def pellizco(factor, giro):
         modo = estado["modo"]
@@ -59,6 +64,9 @@ def main(page: ft.Page):
                 parametros[clave] = limitar(parametros[clave] * factor, 0.3, 3)
         elif modo == "rotacion":
             parametros["rz"] -= giro
+        elif modo == "sesgado":
+            parametros["shxz"] = limitar(parametros["shxz"] * (factor - 1) * 2, -1, 1)
+            parametros["shyz"] = limitar(parametros["shyz"] * (factor - 1) * 2, -1, 1)
 
     def gesto(e):
         n = e.pointer_count
