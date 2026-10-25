@@ -6,7 +6,7 @@ from Matematicas.Rotacion import rotacion_y, rotacion_x, rotacion_z
 from Matematicas.Proyeccion import proyeccion_ortogonal
 
 Neutros = {
-    "tx" : 0, "ty" : 0, "tz": 1,
+    "tx" : 0, "ty" : 0, "tz": 0,
     "sx" : 1, "sy" : 1, "sz": 1,
     "rx" : 0, "ry" : 0, "rz": 0,
     "shxy": 0, "shxz": 0, "shyx": 0, "shyz": 0, "shzx": 0, "shzy": 0,
