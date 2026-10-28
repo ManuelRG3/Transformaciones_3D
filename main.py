@@ -1,5 +1,6 @@
 import math
 import flet as ft
+import estilos as S
 from Controlador.Escena import calcular_escena, Neutros
 from Interfaz.Lienzo import crear_lienzo, dibujar
 
@@ -13,8 +14,8 @@ modos = {
                      "Escalamiento: arrastra para estirar en X e Y; pellizca (o usa la rueda) para escalar todo por igual"),
     "rotacion": ("Rotación",
                  "Rotación: arrastra para girar en X e Y; gira dos dedos (o usa la rueda) para rotar en Z"),
-    "sesgado" : ("Sesgado",
-                 "Sesgado: Arrastra para inclinar la figura (a los lados, arriba o abajo); pellizca o usa la rueda del raton para inclinarla segun la profundidad"),
+    "sesgado": ("Sesgado",
+                "Sesgado: Arrastra para inclinar la figura (a los lados, arriba o abajo); pellizca o usa la rueda del raton para inclinarla segun la profundidad"),
 }
 
 
@@ -23,16 +24,12 @@ def limitar(valor, minimo, maximo):
 
 
 def main(page: ft.Page):
-    page.title = "Transformacion 3D"
+    S.aplicar_tema(page, "Transformación 3D")
     parametros = dict(inicial)
     estado = {"modo": "rotacion"}
     previo = {"n": 0, "escala": 1.0, "rot": 0.0}
 
-    def calcular_lado():
-        ancho = page.width or 500
-        return int(max(250, min(500, ancho - 40)))
-
-    lienzo = crear_lienzo(calcular_lado())
+    lienzo = crear_lienzo(S.calcular_lado(page))
 
     def actualizar():
         puntos, aristas, matriz = calcular_escena(parametros)
@@ -50,14 +47,13 @@ def main(page: ft.Page):
         elif modo == "rotacion":
             parametros["ry"] += dx * sensibilidad
             parametros["rx"] += dy * sensibilidad
-        elif modo == "sesgado" :
+        elif modo == "sesgado":
             parametros["shxy"] = limitar(parametros["shxy"] + dx * 0.004, -1, 1)
             parametros["shyx"] = limitar(parametros["shyx"] - dy * 0.004, -1, 1)
 
     def pellizco(factor, giro):
         modo = estado["modo"]
         if modo == "traslacion":
-            # Separar los dedos acerca la figura (z menor), juntarlos la aleja
             parametros["tz"] = limitar(parametros["tz"] - (factor - 1) * 3, -2, 2)
         elif modo == "escalamiento":
             for clave in ("sx", "sy", "sz"):
@@ -65,8 +61,8 @@ def main(page: ft.Page):
         elif modo == "rotacion":
             parametros["rz"] -= giro
         elif modo == "sesgado":
-            parametros["shxz"] = limitar(parametros["shxz"] * (factor - 1) * 2, -1, 1)
-            parametros["shyz"] = limitar(parametros["shyz"] * (factor - 1) * 2, -1, 1)
+            parametros["shxz"] = limitar(parametros["shxz"] + (factor - 1) * 2, -1, 1)
+            parametros["shyz"] = limitar(parametros["shyz"] + (factor - 1) * 2, -1, 1)
 
     def gesto(e):
         n = e.pointer_count
@@ -89,23 +85,24 @@ def main(page: ft.Page):
         pellizco(factor, (1 - factor) * 100)
         actualizar()
 
-    texto_modo = ft.Text(modos["rotacion"][1])
+    texto_modo = S.texto_descripcion(modos["rotacion"][1])
 
     def cambiar_modo(clave):
         def manejador(e):
             estado["modo"] = clave
             texto_modo.value = modos[clave][1]
             texto_modo.update()
+            S.resaltar(botones, clave)
         return manejador
 
-    botones = [ft.TextButton(modos[c][0], on_click=cambiar_modo(c)) for c in modos]
+    botones = S.crear_botones_modo(modos, estado["modo"], cambiar_modo)
 
     def reiniciar(e):
         parametros.update(inicial)
         actualizar()
 
     def redimensionar(e):
-        lado = calcular_lado()
+        lado = S.calcular_lado(page)
         lienzo.width = lado
         lienzo.height = lado
         actualizar()
@@ -121,20 +118,12 @@ def main(page: ft.Page):
     )
 
     page.add(
-        ft.Row(
-            wrap=True,
-            spacing=20,
-            controls=[
-                figura,
-                ft.Container(
-                    width=300,
-                    content=ft.Column([
-                        texto_modo,
-                        ft.Row(botones, wrap=True, spacing=0),
-                        ft.TextButton("Reiniciar", on_click=reiniciar),
-                    ]),
-                ),
-            ],
+        S.pantalla(
+            S.encabezado("Transformaciones 3D",
+                         "Traslación · Escalamiento · Rotación · Sesgado"),
+            S.marco_lienzo(figura),
+            S.panel_controles(texto_modo, botones,
+                              S.boton_secundario("Reiniciar", reiniciar)),
         )
     )
     actualizar()
