@@ -1,3 +1,4 @@
+
 import flet as ft
 import flet.canvas as cv
 
@@ -11,70 +12,148 @@ class C:
     VERTICE = "#00D1B2"
 
 
-def _alfa(color, opacidad):
-    return ft.Colors.with_opacity(opacidad, color)
+# PINTURAS REUTILIZABLES
+
+PAINT_GRID_MENOR = ft.Paint(
+    color=C.GRID_MENOR,
+    stroke_width=1
+)
+
+PAINT_GRID_MAYOR = ft.Paint(
+    color=C.GRID_MAYOR,
+    stroke_width=1
+)
+
+PAINT_EJE_X = ft.Paint(
+    color=C.EJE_X,
+    stroke_width=1.5
+)
+
+PAINT_EJE_Y = ft.Paint(
+    color=C.EJE_Y,
+    stroke_width=1.5
+)
+
+PAINT_ARISTA = ft.Paint(
+    color=C.ARISTA,
+    stroke_width=2.2,
+    stroke_cap=ft.StrokeCap.ROUND
+)
+
+PAINT_VERTICE = ft.Paint(
+    color=C.VERTICE,
+    style=ft.PaintingStyle.FILL
+)
 
 
 def crear_lienzo(lado):
-    return cv.Canvas(shapes=[], width=lado, height=lado)
+
+    return cv.Canvas(
+        shapes=[],
+        width=lado,
+        height=lado
+    )
 
 
-def _linea(x1, y1, x2, y2, color, grosor):
+def _linea(x1, y1, x2, y2, paint):
+
     return cv.Line(
         x1, y1, x2, y2,
-        paint=ft.Paint(
-            color=color,
-            stroke_width=grosor,
-            style=ft.PaintingStyle.STROKE,
-            stroke_cap=ft.StrokeCap.ROUND,
-        ),
+        paint=paint
     )
 
 
 def _cuadricula(lado, centro, escala):
+
     formas = []
+
     for k in range(-5, 6):
+
         pos = centro + k * escala / 2
-        color = C.GRID_MAYOR if k % 2 == 0 else C.GRID_MENOR
-        formas.append(_linea(pos, 0, pos, lado, color, 1))
-        formas.append(_linea(0, pos, lado, pos, color, 1))
-    formas.append(_linea(0, centro, lado, centro, _alfa(C.EJE_X, 0.7), 1.5))
-    formas.append(_linea(centro, 0, centro, lado, _alfa(C.EJE_Y, 0.7), 1.5))
+
+        paint = (
+            PAINT_GRID_MAYOR
+            if k % 2 == 0
+            else PAINT_GRID_MENOR
+        )
+
+        formas.append(
+            _linea(
+                pos, 0, pos, lado,
+                paint
+            )
+        )
+
+        formas.append(
+            _linea(
+                0, pos, lado, pos,
+                paint
+            )
+        )
+
+    formas.append(
+        _linea(
+            0, centro, lado, centro,
+            PAINT_EJE_X
+        )
+    )
+
+    formas.append(
+        _linea(
+            centro, 0, centro, lado,
+            PAINT_EJE_Y
+        )
+    )
+
     return formas
 
 
 def dibujar(lienzo, puntos, aristas):
+
     lado = lienzo.width
+
     escala = lado / 5
     centro = lado / 2
 
     def a_pantalla(p):
-        return centro + p[0] * escala, centro - p[1] * escala
 
-    formas = _cuadricula(lado, centro, escala)
+        return (
+            centro + p[0] * escala,
+            centro - p[1] * escala
+        )
 
-    segmentos = []
+    formas = _cuadricula(
+        lado,
+        centro,
+        escala
+    )
+
+    # ARISTAS: UNA SOLA LINEA POR ARISTA
+
     for i, j in aristas:
+
         x1, y1 = a_pantalla(puntos[i])
         x2, y2 = a_pantalla(puntos[j])
-        segmentos.append((x1, y1, x2, y2))
 
-    # Brillo (dos capas translúcidas debajo de la línea)
-    for x1, y1, x2, y2 in segmentos:
-        formas.append(_linea(x1, y1, x2, y2, _alfa(C.ARISTA, 0.12), 12))
-    for x1, y1, x2, y2 in segmentos:
-        formas.append(_linea(x1, y1, x2, y2, _alfa(C.ARISTA, 0.25), 6))
-    # Línea principal
-    for x1, y1, x2, y2 in segmentos:
-        formas.append(_linea(x1, y1, x2, y2, C.ARISTA, 2.2))
+        formas.append(
+            _linea(
+                x1, y1, x2, y2,
+                PAINT_ARISTA
+            )
+        )
 
-    # Vértices con halo
-    halo = ft.Paint(color=_alfa(C.VERTICE, 0.25), style=ft.PaintingStyle.FILL)
-    nucleo = ft.Paint(color=C.VERTICE, style=ft.PaintingStyle.FILL)
+    # VERTICES SIN HALOS
+
     for p in puntos:
+
         x, y = a_pantalla(p)
-        formas.append(cv.Circle(x, y, 8, paint=halo))
-        formas.append(cv.Circle(x, y, 3.5, paint=nucleo))
+
+        formas.append(
+            cv.Circle(
+                x, y, 3.5,
+                paint=PAINT_VERTICE
+            )
+        )
 
     lienzo.shapes = formas
     lienzo.update()

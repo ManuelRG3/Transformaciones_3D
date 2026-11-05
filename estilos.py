@@ -32,6 +32,7 @@ ICONOS = {
     "escalamiento": ft.Icons.ASPECT_RATIO,
     "rotacion": ft.Icons.THREED_ROTATION,
     "sesgado": ft.Icons.TRANSFORM,
+    "perspectiva": ft.Icons.CAMERA_ALT,
 }
 
 
@@ -200,6 +201,47 @@ def boton_secundario(texto, on_click=None):
     )
 
 
+# ───────────── SELECTOR DE FIGURAS ─────────────
+def _aspecto_figura(activa):
+    if activa:
+        return dict(
+            gradient=_degradado_primario(),
+            bgcolor=None,
+            border=_borde(_alfa("#FFFFFF", 0.15)),
+        )
+    return dict(
+        gradient=None,
+        bgcolor=Colores.SUPERFICIE_ALT,
+        border=_borde(Colores.BORDE),
+    )
+
+
+def crear_selector_figuras(nombres, activa, al_elegir):
+    """Devuelve {nombre: chip}. `al_elegir(nombre)` debe regresar el manejador del click."""
+    chips = {}
+    for nombre in nombres:
+        es_activa = nombre == activa
+        chips[nombre] = ft.Container(
+            content=ft.Text(nombre, size=12, weight=ft.FontWeight.W_600,
+                            color="white" if es_activa else Colores.TEXTO_SUAVE),
+            padding=_relleno(12, 7),
+            border_radius=20,
+            ink=True,
+            on_click=al_elegir(nombre),
+            **_aspecto_figura(es_activa),
+        )
+    return chips
+
+
+def resaltar_figura(chips, activa):
+    for nombre, chip in chips.items():
+        es_activa = nombre == activa
+        chip.content.color = "white" if es_activa else Colores.TEXTO_SUAVE
+        for atributo, valor in _aspecto_figura(es_activa).items():
+            setattr(chip, atributo, valor)
+        chip.update()
+
+
 # ───────────── TEXTOS Y CHIPS ─────────────
 def texto_descripcion(valor):
     return ft.Text(valor, size=13, color=Colores.TEXTO_SUAVE, expand=True)
@@ -228,7 +270,7 @@ def _etiqueta(texto):
 
 
 # ───────────── PANEL Y PANTALLA ─────────────
-def panel_controles(descripcion, botones, boton_reinicio):
+def panel_controles(descripcion, botones, boton_reinicio, chips_figuras=None):
     info = ft.Container(
         padding=12,
         border_radius=Radio.M,
@@ -243,6 +285,16 @@ def panel_controles(descripcion, botones, boton_reinicio):
             ],
         ),
     )
+
+    bloque_figuras = []
+    if chips_figuras:
+        bloque_figuras = [
+            _etiqueta("Figura"),
+            ft.Row(list(chips_figuras.values()), wrap=True,
+                   spacing=Espacio.S, run_spacing=Espacio.S),
+            ft.Divider(color=Colores.BORDE, height=4),
+        ]
+
     return ft.Container(
         width=340,
         padding=20,
@@ -254,6 +306,7 @@ def panel_controles(descripcion, botones, boton_reinicio):
         content=ft.Column(
             spacing=12,
             controls=[
+                *bloque_figuras,
                 _etiqueta("Modo de transformación"),
                 ft.Column(list(botones.values()), spacing=6),
                 ft.Divider(color=Colores.BORDE, height=4),
