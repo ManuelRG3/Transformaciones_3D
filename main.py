@@ -1,4 +1,3 @@
-
 import math
 import time
 import flet as ft
@@ -156,9 +155,9 @@ def main(page: ft.Page):
         elif modo == "perspectiva":
 
             parametros["d"] = limitar(
-                parametros["d"] + dy * 0.05,
-                4,
-                30
+                parametros["d"] + dy * 0.12,
+                3,
+                20
             )
 
     # PELLIZCO Y ZOOM
@@ -207,8 +206,8 @@ def main(page: ft.Page):
 
             parametros["d"] = limitar(
                 parametros["d"] / factor,
-                4,
-                30
+                3,
+                20
             )
 
     # DETECCION DE MOVIMIENTO

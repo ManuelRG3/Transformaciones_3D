@@ -45,17 +45,23 @@ def calcular_escena(Parametros, figura="Cubo"):
         **Parametros
     }
 
+    # TRASLACION
+
     t = traslacion(
         p["tx"],
         p["ty"],
         p["tz"]
     )
 
+    # ROTACION
+
     r = (
         rotacion_x(p["rx"])
         @ rotacion_y(p["ry"])
         @ rotacion_z(p["rz"])
     )
+
+    # SESGADO
 
     h = sesgado(
         p["shxy"],
@@ -66,11 +72,15 @@ def calcular_escena(Parametros, figura="Cubo"):
         p["shzy"]
     )
 
+    # ESCALAMIENTO
+
     s = escalamiento(
         p["sx"],
         p["sy"],
         p["sz"]
     )
+
+    # MATRIZ DE TRANSFORMACION
 
     Matriz = t @ r @ h @ s
 
@@ -78,19 +88,23 @@ def calcular_escena(Parametros, figura="Cubo"):
         Matriz @ Vertices.T
     ).T
 
-    # Perspectiva
+    # PERSPECTIVA 3D
 
-    d = p["d"]
+    d = max(float(p["d"]), 3.0)
 
     x = Transformados[:, 0]
     y = Transformados[:, 1]
     z = Transformados[:, 2]
 
-    factor = d / np.maximum(d - z, 0.1)
+    denominador = np.maximum(d - z, 0.5)
+
+    factor = d / denominador
 
     Puntos_2d = np.column_stack((
         x * factor,
         y * factor
     ))
+
+    # DEVOLVER RESULTADOS
 
     return Puntos_2d, Aristas, Matriz
