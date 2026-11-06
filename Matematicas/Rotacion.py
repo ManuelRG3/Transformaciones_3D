@@ -1,3 +1,6 @@
+#se encarga de crear las matrices de rotacion a partir 
+#del angulo en grados, para luego multiplicarlas con la matriz de transformacion acumulada.
+
 import numpy as np
 
 def rotacion_y(angulo_grados):

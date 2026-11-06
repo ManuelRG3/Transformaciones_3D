@@ -1,3 +1,6 @@
+#se encarga de crear la matriz de sesgado a partir de los factores de sesgado en cada eje y tambien de los factores de sesgado cruzado,
+#para luego multiplicarla con la matriz de transformacion acumulada.
+
 import numpy as np
 
 def sesgado(shxy, shxz, shyx, shyz, shzx, shzy):

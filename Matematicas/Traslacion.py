@@ -1,3 +1,6 @@
+#este codigo se encarga de crear la matriz de traslacion a partir de los valores de traslacion en cada eje,
+#para luego multiplicarla con la matriz de transformacion acumulada.
+
 import numpy as np
 
 def traslacion(tx, ty, tz):

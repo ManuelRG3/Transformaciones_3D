@@ -1,3 +1,6 @@
+#se encarga de crear la matriz de escalamiento a partir de los factores de escala en cada eje, 
+#para luego multiplicarla con la matriz de transformacion acumulada.
+
 import numpy as np
 
 def escalamiento(SX, SY, SZ):

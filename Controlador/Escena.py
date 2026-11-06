@@ -1,3 +1,6 @@
+#es el unico que conoce las demas capas y se encarga de calcular la escena 3D a partir de los parametros que recibe de la interfaz,
+#aplicando las transformaciones en el orden correcto y devolviendo los vertices proyectados en 2D, las aristas y la matriz de transformacion final.
+
 import numpy as np
 
 from Modelos.Cubo import FIGURAS

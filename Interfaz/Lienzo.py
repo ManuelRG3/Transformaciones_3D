@@ -1,3 +1,5 @@
+#Convierte los puntos 2D a pixeles y los dibuja en el lienzo, junto con la cuadricula y los ejes.
+#tambien se encarga de crear el lienzo y las pinturas reutilizables para dibujar los elementos de la escena.
 
 import flet as ft
 import flet.canvas as cv

@@ -1,3 +1,6 @@
+#concentra el aspecto visual: colores, tamaños, bordes, gradientes, etc. 
+#y provee funciones para crear los controles de la interfaz.
+
 import flet as ft
 
 

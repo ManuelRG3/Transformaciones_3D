@@ -1,3 +1,7 @@
+#aqui se arma la ventana, interpreta los gestos segun el modo activo y actualiza el 
+#diccionario de parametros, que luego se pasa al controlador para calcular la escena 
+#y dibujarla en el lienzo.
+
 import math
 import time
 import flet as ft

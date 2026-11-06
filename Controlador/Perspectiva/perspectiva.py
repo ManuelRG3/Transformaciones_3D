@@ -1,3 +1,5 @@
+#aplicacion de la matriz de perspectiva a los vertices 3D, para proyectarlos en 2D.
+
 import numpy as np
 
 

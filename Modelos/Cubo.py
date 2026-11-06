@@ -1,3 +1,5 @@
+#Guarda la figura como datos: ocho vertices en coordenadas homogeneas 
+#sy doce aristas para el cubo, cinco vertices y ocho aristas para la piramide, etc.
 
 import math
 import numpy as np
